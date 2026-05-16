@@ -6,10 +6,14 @@ Resurse folosite:
 Google Scholar Scraping: https://medium.com/@darshankhandelwal12/scrape-google-scholar-using-python-3f35a3a6597b
 """
 
+import result
 from bs4 import BeautifulSoup
 
 # ne ajuta sa obtinem datele HTML de la un anumit site
 import requests
+
+# Pentru procesarea textului cu expresii regulate
+import re
 
 def get_web_data():
     """
@@ -94,7 +98,7 @@ def get_author(r):
     authors = []
     for elem in r.select(".gs_a"):
         if elem:
-            # Unele elemte din lista contin un non-breaking space
+            # Unele elemente din lista contin un non-breaking space
             # Acesta este inlocui cu cratima "-" pentru  avea o structura constanta
             # Si pentru a fi mai usoara procesarea ulteriora
             authors.append(elem.text.replace("\xa0", " "))
@@ -116,19 +120,35 @@ def get_reference_number(r):
 
     return reference_number
 
+def process_authors(author_unprocessed):
+    """
+    Proceseaza lista bruta de autori si extrage doar numele acestora
+    prin pastrarea partii dinaintea primului " - "
+    :param author_unprocessed: lista de siruri neprocesate cu autori
+    :return: lista doar cu numele autorilor
+    """
+    processed = []
+    for author_text in author_unprocessed:
+        parts = author_text.split(" - ")
+        author_only = parts[0].strip()
+        processed.append(author_only)
+    return processed
 
-
-# ********** PT DENISA **********
-
-
-# prima lista e aia cu numele articolului, aici nu mia ai ce sa procesezi ca sunt extrase bine
-# a 2 a lista e cu link urile, nici asta nu trebuie procesata
-# a 3 a lista e cu autorii asta trebuie procesata ca sa iti ramana doar numele autorului
-# a 4 lista e cu numaru de citari si astra trebuie procesata ca sa iti ramana doar numaru efectiv de citari
-# dupa faci csv
-
-# am afisat len de firacre lista asa ca verificare, e irelevant in principiu
-
+def process_reference_number(ref_nr_unprocessed):
+    """
+    Proceseaza lista bruta cu informatii despre citari si extrage doar numarul efectiv.
+    :param ref_nr_unprocessed: lista de siruri neprocesate despre citari
+    :return: lista cu numarul de citari
+    """
+    processed_ref = []
+    for ref_nr_text in ref_nr_unprocessed:
+        match = re.search(r"\d+", ref_nr_text)
+        if match:
+            processed_ref.append(match.group())
+        else:
+            # Daca nu exista nici un numar de cititori punem 0
+            processed_ref.append(0)
+    return processed_ref
 
 result = get_web_data()
 
@@ -146,4 +166,6 @@ print(len(autori))
 print(nr_referinte)
 print(len(nr_referinte))
 
+print(process_authors(get_author(result)))
+print(process_reference_number(get_reference_number(result)))
 

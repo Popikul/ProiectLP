@@ -5,6 +5,7 @@ de pe Google Academic. Se folosete keyword-ul "python programming"
 Resurse folosite:
 Google Scholar Scraping: https://medium.com/@darshankhandelwal12/scrape-google-scholar-using-python-3f35a3a6597b
 """
+import csv
 
 import result
 from bs4 import BeautifulSoup
@@ -150,22 +151,34 @@ def process_reference_number(ref_nr_unprocessed):
             processed_ref.append(0)
     return processed_ref
 
+def save_to_csv(titles, authors, links, references, filename = 'rezultate.csv'):
+    """
+    Salveaza datele extrase si procesate intr-un fisier CSV.
+    :param titles: Lista cu titlurile articolelor
+    :param authors: Lista cu autorii articolelor
+    :param links: Lista cu link-urile articolelor
+    :param references: Lista cu numarul de citari ale articolelor
+    :param filename: Numele fisierului CSV
+    :return:
+    """
+    nr_rows = min(len(titles), len(authors), len(links), len(references))
+
+    with open(filename, 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(["title", "author", "link", "references"])
+
+        for i in range(nr_rows):
+            writer.writerow([titles[i], authors[i], links[i], references[i]])
+
+    print(f"Datele au fost salvate in fisierul: {filename}")
+
 result = get_web_data()
 
 titluri = get_title(result)
 linkuri = get_links(result)
-autori = get_author(result)
-nr_referinte = get_reference_number(result)
+autori = process_authors(get_author(result))
+nr_referinte = process_reference_number(get_reference_number(result))
 
-print(titluri)
-print(len(titluri))
-print(linkuri)
-print(len(linkuri))
-print(autori)
-print(len(autori))
-print(nr_referinte)
-print(len(nr_referinte))
+save_to_csv(titluri, autori, linkuri, nr_referinte)
 
-print(process_authors(get_author(result)))
-print(process_reference_number(get_reference_number(result)))
 

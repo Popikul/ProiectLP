@@ -87,7 +87,7 @@ def get_author(r):
     for elem in r.select(".gs_a"):
         if elem:
             # Unele elemente din lista contin un non-breaking space
-            # Acesta este inlocui cu cratima "-" pentru  avea o structura constanta
+            # Acesta este inlocui cu " " pentru  avea o structura constanta
             # Si pentru a fi mai usoara procesarea ulteriora
             authors.append(elem.text.replace("\xa0", " "))
 

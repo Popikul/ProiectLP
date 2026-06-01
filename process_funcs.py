@@ -24,6 +24,7 @@ def process_reference_number(ref_nr_unprocessed):
     """
     processed_ref = []
     for ref_nr_text in ref_nr_unprocessed:
+        # \d+ cauta mai multe cifre una dupa alta
         match = re.search(r"\d+", ref_nr_text)
         if match:
             processed_ref.append(match.group())
